@@ -1,0 +1,76 @@
+version: "3"
+services:
+  eureka-cntr:
+    image: eureka-img
+    build: ./eureka-service-registry
+    ports:
+      - "1761:8761"
+    networks:
+      - my-net
+  
+  zipkin-server:
+    image: openzipkin/zipkin
+    ports:
+      - "1411:9411"
+    networks:
+      - my-net
+  
+  gateway-cntr:
+    image: gateway-img
+    build: ./api-gateway
+    ports:
+      - "1060:8060"
+    networks:
+      - my-net
+    depends_on:
+      - eureka-cntr
+      - zipkin-server
+
+  auth-cntr:
+    image: auth-img
+    build: ./authentication-service
+    ports:
+      - "1090:8090"
+    networks:
+      - my-net
+    depends_on:
+      - eureka-cntr
+      - zipkin-server
+      - gateway-cntr
+
+  department-cntr:
+    image: department-img
+    build: ./department-service
+    ports:
+      - "1081:8081"
+    networks:
+      - my-net
+    depends_on:
+      - eureka-cntr
+      - zipkin-server
+      - gateway-cntr
+      - auth-cntr
+  
+  employee-cntr:
+    image: employee-img
+    build: ./employee-service
+    ports:
+      - "1082:8082"
+    networks:
+      - my-net
+    depends_on:
+      - eureka-cntr
+      - zipkin-server
+      - gateway-cntr
+      - auth-cntr
+
+  # mysqldb:
+  #   image: mysql:8
+  #   networks:
+  #     - app-network
+  #   environment:
+  #     - MYSQL_ROOT_PASSWORD=root
+  #     - MYSQL_DATABASE=organizationdb
+
+networks:
+  my-net:

@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: employee-service
+  labels:
+    app: employee-service
+spec:
+  replicas: 1  # Number of pods to run
+  selector:
+    matchLabels:
+      app: employee-service
+  template:
+    metadata:
+      labels:
+        app: employee-service
+    spec:
+      containers:
+      - name: employee-cntr
+        image: faizankhan06/employee-img:latest  # Replace with your image name
+        ports:
+        - containerPort: 8082  # Port your Spring Boot app listens on
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: employee-cntr
+spec:
+  selector:
+    app: employee-service
+  ports:
+    - protocol: TCP
+      port: 8082  # Port exposed inside the Kubernetes cluster
+      targetPort: 8082  # Port Spring Boot app listens on
+  type: LoadBalancer  # Internal service (can change to LoadBalancer or NodePort)

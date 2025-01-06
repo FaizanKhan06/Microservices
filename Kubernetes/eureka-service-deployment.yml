@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: eureka-service
+  labels:
+    app: eureka-service
+spec:
+  replicas: 1  # Number of pods to run
+  selector:
+    matchLabels:
+      app: eureka-service
+  template:
+    metadata:
+      labels:
+        app: eureka-service
+    spec:
+      containers:
+      - name: eureka-cntr
+        image: faizankhan06/eureka-img:latest  # Replace with your image name
+        ports:
+        - containerPort: 8761  # Port your Spring Boot app listens on
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: eureka-cntr
+spec:
+  selector:
+    app: eureka-service
+  ports:
+    - protocol: TCP
+      port: 8761  # Port exposed inside the Kubernetes cluster
+      targetPort: 8761  # Port Spring Boot app listens on
+  type: LoadBalancer  # Internal service (can change to LoadBalancer or NodePort)
